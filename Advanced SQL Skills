@@ -1,0 +1,57 @@
+-- JOINS (LEFT, RIGHT SELF) -- 
+
+SELECT * FROM tutorial.crunchbase_companies;
+SELECT CASE WHEN invest.investor_name IS NULL THEN 'No Investor'
+      ELSE invest.investor_name END AS Investors,
+       COUNT(DISTINCT companies.permalink) AS companies_invested 
+    FROM tutorial.crunchbase_companies companies
+    LEFT JOIN tutorial.crunchbase_investments invest
+    ON invest.company_permalink = companies.permalink 
+    GROUP BY invest.investor_name 
+    ORDER BY companies_invested DESC 
+    
+    -- UNION ALL -- 
+    
+SELECT 'investments_part1' AS database_name,
+       company.status,
+       COUNT(DISTINCT investments.investor_permalink) AS investor_count
+       FROM tutorial.crunchbase_companies company 
+       LEFT JOIN tutorial.crunchbase_investments_part1 investments
+       ON company.permalink = investments.company_permalink 
+       GROUP BY database_name, company.status 
+       
+UNION ALL 
+
+SELECT 'investment_part2' AS database_name, 
+       company.status, 
+       COUNT(DISTINCT investment.investor_permalink) AS investor_count
+       FROM tutorial.crunchbase_companies company
+       LEFT JOIN tutorial.crunchbase_investments_part2 investment
+       ON company.permalink = investment.company_permalink 
+       GROUP BY database_name, company.status
+LIMIT 100
+
+-- CAST, DATE SYNTAX -- 
+
+SELECT 
+    CAST(funding_total_usd AS VARCHAR) AS funding_total_usd_string,
+        founded_at_clean::VARCHAR AS funding_at_string
+    FROM tutorial.crunchbase_companies_clean_date
+   LIMIT 100
+
+SELECT companies.category_code,
+       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '3 years'
+                       THEN 1 ELSE NULL END) AS acquired_3_yrs,
+       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '5 years'
+                       THEN 1 ELSE NULL END) AS acquired_5_yrs,
+       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '10 years'
+                       THEN 1 ELSE NULL END) AS acquired_10_yrs,
+       COUNT(1) AS total
+  FROM tutorial.crunchbase_companies_clean_date companies
+  JOIN tutorial.crunchbase_acquisitions_clean_date acquisitions
+    ON acquisitions.company_permalink = companies.permalink
+ WHERE founded_at_clean IS NOT NULL
+ GROUP BY 1
+ ORDER BY 5 DESC
+LIMIT 100
+
