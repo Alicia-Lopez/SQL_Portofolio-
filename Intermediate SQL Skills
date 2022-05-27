@@ -1,0 +1,53 @@
+-- SUM, AVG, MIN, MAX -- 
+
+SELECT year,
+       month, 
+       SUM(DISTINCT volume) AS sum_volume
+       FROM tutorial.aapl_historical_stock_price
+       GROUP BY year, month  
+       ORDER BY year, month
+      
+SELECT AVG(open)
+  FROM tutorial.aapl_historical_stock_price
+  LIMIT 100
+
+SELECT year,
+       month,
+       MIN(low) AS low_price,
+       MAX(high) AS high_price
+    FROM tutorial.aapl_historical_stock_price
+    GROUP BY year, month
+    ORDER BY month, year
+    
+-- CASE & COUNT FUNCTION -- 
+
+SELECT player_name, 
+       height,
+    CASE WHEN height > 0 AND height <= 20 THEN '0-20'
+    WHEN height >20 AND height <=40 THEN '21-40'
+    WHEN height >40 AND height <=60 THEN '41-60'
+    WHEN height >60 AND height <=80 THEN '60-80'
+    ELSE '80+' END AS height_case
+    FROM benn.college_football_players
+    
+SELECT COUNT(CASE WHEN year = 'FR' THEN 1 ELSE NULL END) AS fr_players,
+       COUNT(CASE WHEN year = 'SO' THEN 1 ELSE NULL END) AS so_players,
+       COUNT(CASE WHEN year = 'JR' THEN 1 ELSE NULL END) AS jr_players,
+       COUNT(CASE WHEN year = 'SR' THEN 1 ELSE NULL END) AS sr_players,
+       COUNT(player_name) AS total_players,
+       state
+    FROM benn.college_football_players
+    GROUP BY state
+    ORDER BY total_players DESC
+    
+SELECT * FROM benn.college_football_players;
+SELECT 
+  CASE WHEN year IN ('SR', 'JR') THEN 'upperclass' 
+  WHEN year IN ('FR', 'SO') THEN 'underclass'
+  ELSE NULL END AS player_class,
+  SUM(weight) AS sum_weight
+  FROM benn.college_football_players
+  WHERE state = 'CA' 
+  GROUP BY player_class
+    
+  
