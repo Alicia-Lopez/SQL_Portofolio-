@@ -1,2 +1,2 @@
 # SQL_Portofolio-
-A collection of my SQL files 
+A collection of my samples SQL files 
