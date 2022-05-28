@@ -1,4 +1,4 @@
--- JOINS (LEFT, RIGHT SELF) -- 
+-- JOINS (LEFT, RIGHT, SELF) -- 
 
 SELECT * FROM tutorial.crunchbase_companies;
 SELECT CASE WHEN invest.investor_name IS NULL THEN 'No Investor'
@@ -10,7 +10,7 @@ SELECT CASE WHEN invest.investor_name IS NULL THEN 'No Investor'
     GROUP BY invest.investor_name 
     ORDER BY companies_invested DESC 
     
-    -- UNION ALL -- 
+-- UNION ALL -- 
     
 SELECT 'investments_part1' AS database_name,
        company.status,
@@ -31,7 +31,7 @@ SELECT 'investment_part2' AS database_name,
        GROUP BY database_name, company.status
 LIMIT 100
 
--- CAST, DATE SYNTAX -- 
+-- CAST -- 
 
 SELECT 
     CAST(funding_total_usd AS VARCHAR) AS funding_total_usd_string,
@@ -39,19 +39,38 @@ SELECT
     FROM tutorial.crunchbase_companies_clean_date
    LIMIT 100
 
-SELECT companies.category_code,
-       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '3 years'
-                       THEN 1 ELSE NULL END) AS acquired_3_yrs,
-       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '5 years'
-                       THEN 1 ELSE NULL END) AS acquired_5_yrs,
-       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '10 years'
-                       THEN 1 ELSE NULL END) AS acquired_10_yrs,
-       COUNT(1) AS total
-  FROM tutorial.crunchbase_companies_clean_date companies
-  JOIN tutorial.crunchbase_acquisitions_clean_date acquisitions
-    ON acquisitions.company_permalink = companies.permalink
- WHERE founded_at_clean IS NOT NULL
- GROUP BY 1
- ORDER BY 5 DESC
-LIMIT 100
+-- LEFT, RIGHT --
 
+SELECT incidnt_num,
+       date,
+       LEFT(date, 10) AS cleaned_date,
+       RIGHT(date, 17) AS cleaned_time
+  FROM tutorial.sf_crime_incidents_2014_01
+
+--TRIM -- 
+
+SELECT location,
+       TRIM(both '()' FROM location)
+  FROM tutorial.sf_crime_incidents_2014_01
+  
+-- POSITON -- 
+
+SELECT incidnt_num,
+       descript,
+       POSITION('A' IN descript) AS a_position
+  FROM tutorial.sf_crime_incidents_2014_01
+  
+-- SUBSTR --
+
+SELECT incidnt_num,
+       date,
+       SUBSTR(date, 4, 2) AS day
+  FROM tutorial.sf_crime_incidents_2014_01
+  
+-- CONCAT -- 
+
+SELECT incidnt_num,
+       day_of_week,
+       LEFT(date, 10) AS cleaned_date,
+       CONCAT(day_of_week, ', ', LEFT(date, 10)) AS day_and_date
+  FROM tutorial.sf_crime_incidents_2014_01
